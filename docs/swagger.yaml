@@ -1,0 +1,857 @@
+definitions:
+  models.CashierSalesReport:
+    properties:
+      cashier:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/models.ProductReport'
+        type: array
+      sales_count:
+        type: integer
+      total_amount:
+        type: number
+      total_items:
+        type: integer
+    type: object
+  models.Category:
+    properties:
+      added_by:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.Product:
+    properties:
+      added_by:
+        type: integer
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.ProductReport:
+    properties:
+      product_name:
+        type: string
+      total_amount:
+        type: number
+      total_quantity:
+        type: integer
+    type: object
+  models.Receipt:
+    properties:
+      cashier:
+        type: string
+      date:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/models.ReceiptItem'
+        type: array
+      total_sum:
+        type: number
+    type: object
+  models.ReceiptItem:
+    properties:
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      total_price:
+        type: number
+      unit_price:
+        type: number
+    type: object
+  models.Sale:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      total_sum:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.SaleItem:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      sale_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.UserSignIn:
+    properties:
+      password_hash:
+        type: string
+      username:
+        type: string
+    type: object
+  models.UserSignUp:
+    properties:
+      name:
+        type: string
+      password:
+        description: Пользователь вводит обычный пароль
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /categories:
+    get:
+      description: Возвращает список всех категорий
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить все категории
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Принимает JSON и создаёт категорию
+      parameters:
+      - description: Категория
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Создать новую категорию
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      description: Удаляет категорию по ID. Если используется — выдаёт ошибку.
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Удалить категорию
+      tags:
+      - categories
+    get:
+      description: Возвращает категорию по ID
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить категорию по ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Обновляет категорию по ID
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновлённая категория
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Обновить категорию
+      tags:
+      - categories
+  /ping:
+    get:
+      description: Проверяет, работает ли сервер, и возвращает сообщение
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Сервер работает
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Проверка доступности сервера
+      tags:
+      - system
+  /products:
+    get:
+      description: Возвращает список всех продуктов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить все продукты
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Принимает JSON и создаёт новый продукт
+      parameters:
+      - description: Новый продукт
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Создать продукт
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Удаляет продукт по ID
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Удалить продукт
+      tags:
+      - products
+    get:
+      description: Возвращает продукт по его идентификатору
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить продукт по ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные продукта по ID
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновлённые данные продукта
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Обновить продукт
+      tags:
+      - products
+  /receipts/{id}:
+    get:
+      description: Возвращает информацию о чеке продажи по идентификатору
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Receipt'
+        "400":
+          description: Неверный ID продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Чек не найден
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при получении чека
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить чек по ID продажи
+      tags:
+      - receipts
+  /reports/sales:
+    get:
+      description: Возвращает отчёт по продажам между датами from и to (в формате
+        YYYY-MM-DD)
+      parameters:
+      - description: Дата начала периода (YYYY-MM-DD)
+        in: query
+        name: from
+        required: true
+        type: string
+      - description: Дата конца периода (YYYY-MM-DD)
+        in: query
+        name: to
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CashierSalesReport'
+        "400":
+          description: Параметры запроса from и to обязательны
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при формировании отчёта
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить отчёт по продажам за период
+      tags:
+      - reports
+  /sale-items:
+    get:
+      description: Возвращает список всех позиций продажи (SaleItems)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SaleItem'
+            type: array
+        "500":
+          description: Ошибка сервера при получении позиций продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить все позиции продажи
+      tags:
+      - sale-items
+    post:
+      consumes:
+      - application/json
+      description: Создает новую позицию продажи
+      parameters:
+      - description: Данные позиции продажи
+        in: body
+        name: saleItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaleItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Позиция продажи успешно создана
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при создании позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Создать позицию продажи
+      tags:
+      - sale-items
+  /sale-items/{id}:
+    delete:
+      description: Удаляет позицию продажи по ID
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Позиция продажи успешно удалена
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при удалении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Удалить позицию продажи
+      tags:
+      - sale-items
+    get:
+      description: Возвращает позицию продажи по идентификатору
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SaleItem'
+        "400":
+          description: Неверный ID позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при получении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить позицию продажи по ID
+      tags:
+      - sale-items
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные позиции продажи по ID
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные позиции продажи
+        in: body
+        name: saleItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaleItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SaleItem'
+        "400":
+          description: Неверный запрос или ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при обновлении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Обновить позицию продажи
+      tags:
+      - sale-items
+  /sales:
+    get:
+      description: Возвращает список всех продаж
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Sale'
+            type: array
+        "500":
+          description: Ошибка сервера при получении продаж
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить все продажи
+      tags:
+      - sales
+    post:
+      consumes:
+      - application/json
+      description: Создает новую продажу
+      parameters:
+      - description: Данные продажи
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sale'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное создание
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при создании продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Создать продажу
+      tags:
+      - sales
+  /sales/{id}:
+    delete:
+      description: Удаляет продажу по ID
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Удаление успешно
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при удалении
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Удалить продажу
+      tags:
+      - sales
+    get:
+      description: Возвращает продажу по идентификатору
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sale'
+        "400":
+          description: Неверный ID продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при получении продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получить продажу по ID
+      tags:
+      - sales
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные продажи по ID
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные продажи
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sale'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sale'
+        "400":
+          description: Неверный запрос или ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при обновлении
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Обновить продажу
+      tags:
+      - sales
+  /signin:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет имя пользователя и пароль, возвращает JWT токен
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT access token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный JSON
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Неверное имя пользователя или пароль
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка генерации токена
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Авторизация пользователя
+      tags:
+      - auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя на основе переданных данных (username,
+        password и т.п.)
+      parameters:
+      - description: Данные нового пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная регистрация
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный JSON
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка при создании пользователя
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - auth
+swagger: "2.0"

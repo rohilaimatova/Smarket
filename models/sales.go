@@ -1,0 +1,11 @@
+package models
+
+import "time"
+
+type Sale struct {
+	ID        int        `json:"id" db:"id"`
+	UserID    int        `json:"user_id" db:"user_id"`
+	TotalSum  float64    `json:"total_sum" db:"total_sum"`
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
+}
