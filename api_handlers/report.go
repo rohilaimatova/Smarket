@@ -13,7 +13,7 @@ import (
 // @Produce json
 // @Param from query string true "Дата начала периода (YYYY-MM-DD)"
 // @Param to query string true "Дата конца периода (YYYY-MM-DD)"
-// @Success 200 {object} models.CashierSalesReport
+// @Success 200 {object} models.Report
 // @Failure 400 {object} models.ErrorResponse "Параметры запроса from и to обязательны"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при формировании отчёта"
 // @Router /reports/sales [get]

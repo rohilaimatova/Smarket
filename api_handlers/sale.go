@@ -55,13 +55,13 @@ func GetSaleByID(c *gin.Context) {
 // @Tags sales
 // @Accept json
 // @Produce json
-// @Param sale body models.Sale true "Данные продажи"
+// @Param sale body models.CreateSaleRequest true "Данные продажи"
 // @Success 200 {object} map[string]string "Успешное создание"
 // @Failure 400 {object} models.ErrorResponse "Неверный запрос"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при создании продажи"
 // @Router /sales [post]
 func CreateSale(c *gin.Context) {
-	var newSale models.Sale
+	var newSale models.CreateSaleRequest
 	if err := c.ShouldBindJSON(&newSale); err != nil {
 		respondWithError(c, http.StatusBadRequest, "Invalid request payload", err)
 

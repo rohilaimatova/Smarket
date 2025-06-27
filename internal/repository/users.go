@@ -3,7 +3,10 @@ package repository
 import (
 	"Smarket/internal/db"
 	"Smarket/models"
+	"Smarket/pkg/errs"
 	"Smarket/pkg/logger"
+	"database/sql"
+	"errors"
 )
 
 func GetUserByUsernameAndPassword(username string, password string) (user models.User, err error) {
@@ -29,6 +32,11 @@ func GetUserByUsername(username string) (models.User, error) {
 	query := `SELECT id, username, password_hash FROM users WHERE username = $1`
 	err := db.GetDBConn().Get(&user, query, username)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			logger.Error.Printf("repository.GetUserByUsername(): failed to fetch from database: %s\n", err.Error())
+			return user, errs.ErrNotFound
+		}
+
 		logger.Error.Printf("repository.GetUserByUsername(): failed to fetch from database: %s\n", err.Error())
 		return user, err
 	}

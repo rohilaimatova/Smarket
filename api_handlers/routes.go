@@ -3,7 +3,7 @@ package api_handlers
 // @title Smarket API
 // @version 1.0
 // @description This is the Smarket API for managing sales and inventory
-// @host localhost:8989
+// @host localhost:8050
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth
@@ -42,7 +42,6 @@ func RunServer() error {
 
 	profileG := apiG.Group("/profile")
 	{
-		profileG.GET("")
 		profileG.PUT("")
 	}
 
@@ -68,7 +67,7 @@ func RunServer() error {
 	{
 		sale.GET("/", GetAllSales)
 		sale.GET("/:id", GetSaleByID)
-		sale.POST("/", CreateSale)
+		sale.POST("/", CreateSale) //with items
 		sale.PUT("/:id", UpdateSale)
 		sale.DELETE("/:id", DeleteSale)
 	}
@@ -77,7 +76,6 @@ func RunServer() error {
 	{
 		saleItems.GET("/", GetAllSaleItems)
 		saleItems.GET("/:id", GetSaleItemByID)
-		saleItems.POST("/", CreateSaleItem)
 		saleItems.PUT("/:id", UpdateSaleItem)
 		saleItems.DELETE("/:id", DeleteSaleItem)
 	}

@@ -43,7 +43,7 @@ func GetSaleByID(id int) (models.Sale, error) {
 	return sale, nil
 }
 
-func CreateSale(sale models.Sale) error {
+func CreateSale(sale models.Sale) (int, error) {
 	logger.Info.Printf("repository.CreateSale: creating sale: %+v", sale)
 
 	query := `
@@ -55,11 +55,11 @@ func CreateSale(sale models.Sale) error {
 	err := db.GetDBConn().Get(&id, query, sale.UserID, sale.TotalSum)
 	if err != nil {
 		logger.Error.Printf("repository.CreateSale: failed to create sale: %v", err)
-		return translateError(err)
+		return id, translateError(err)
 	}
 
 	logger.Info.Printf("repository.CreateSale: sale created with ID %d", id)
-	return nil
+	return id, nil
 }
 
 func UpdateSale(id int, sale models.Sale) (models.Sale, error) {

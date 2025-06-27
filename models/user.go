@@ -14,11 +14,11 @@ type User struct {
 
 type UserSignUp struct {
 	Username string `json:"username"`
-	Password string `json:"password"` // Пользователь вводит обычный пароль
+	Password string `json:"password"`
 	Name     string `json:"name"`
 }
 
 type UserSignIn struct {
 	Username     string `json:"username"`
-	PasswordHash string `json:"password_hash" db:"password_hash"`
+	PasswordHash string `json:"password" db:"password_hash"`
 }

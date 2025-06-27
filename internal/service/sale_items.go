@@ -40,29 +40,29 @@ func GetSaleItemByID(id int) (models.SaleItem, error) {
 	return item, nil
 }
 
-func CreateSaleItem(item models.SaleItem) error {
-	if item.ProductID == 0 || item.SaleID == 0 || item.Quantity <= 0 {
-		logger.Warn.Printf("CreateSaleItem: invalid input: %+v", item)
-		return errs.ErrInvalidValue
-	}
-
-	product, err := repository.GetProductByID(item.ProductID)
-	if err != nil {
-		logger.Error.Printf("CreateSaleItem: product not found (product_id=%d): %v", item.ProductID, err)
-		return errors.Join(errs.ErrInvalidValue, err)
-	}
-
-	item.Price = product.Price
-
-	err = repository.CreateSaleItem(item)
-	if err != nil {
-		logger.Error.Printf("CreateSaleItem: failed to create sale item %+v: %v", item, err)
-		return errors.Join(errs.ErrInternal, err)
-	}
-
-	logger.Info.Printf("CreateSaleItem: sale item created successfully: %+v", item)
-	return nil
-}
+//func CreateSaleItem(item models.SaleItem) error {
+//	if item.ProductID == 0 || item.SaleID == 0 || item.Quantity <= 0 {
+//		logger.Warn.Printf("CreateSaleItem: invalid input: %+v", item)
+//		return errs.ErrInvalidValue
+//	}
+//
+//	product, err := repository.GetProductByID(item.ProductID)
+//	if err != nil {
+//		logger.Error.Printf("CreateSaleItem: product not found (product_id=%d): %v", item.ProductID, err)
+//		return errors.Join(errs.ErrInvalidValue, err)
+//	}
+//
+//	item.Price = product.Price
+//
+//	err = repository.CreateSaleItem(item)
+//	if err != nil {
+//		logger.Error.Printf("CreateSaleItem: failed to create sale item %+v: %v", item, err)
+//		return errors.Join(errs.ErrInternal, err)
+//	}
+//
+//	logger.Info.Printf("CreateSaleItem: sale item created successfully: %+v", item)
+//	return nil
+//}
 
 func UpdateSaleItem(id int, item models.SaleItem) (models.SaleItem, error) {
 	updatedItem, err := repository.UpdateSaleItem(id, item)

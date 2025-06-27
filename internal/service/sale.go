@@ -40,15 +40,57 @@ func GetSaleByID(id int) (models.Sale, error) {
 	return sale, nil
 }
 
-func CreateSale(sale models.Sale) error {
-	if sale.UserID == 0 || sale.TotalSum <= 0 {
-		logger.Warn.Printf("CreateSale: invalid input: %+v", sale)
+func CreateSale(saleRequest models.CreateSaleRequest) error {
+	var (
+		totalSum float64
+	)
+
+	if saleRequest.UserId == 0 || len(saleRequest.Products) == 0 {
+		logger.Warn.Printf("CreateSale: invalid input: %+v", saleRequest)
 		return errs.ErrInvalidValue
 	}
 
-	if err := repository.CreateSale(sale); err != nil {
+	for _, saleProduct := range saleRequest.Products {
+		productInfo, err := repository.GetProductByID(saleProduct.Id)
+		if err != nil {
+			logger.Error.Printf("CreateSaleItem: product not found (product_id=%d): %v", productInfo.ID, err)
+			return errors.Join(errs.ErrInvalidValue, err)
+		}
+
+		totalSum += productInfo.Price * float64(saleProduct.Count)
+	}
+
+	sale := models.Sale{
+		UserID:   saleRequest.UserId,
+		TotalSum: totalSum,
+	}
+
+	saleId, err := repository.CreateSale(sale)
+	if err != nil {
 		logger.Error.Printf("CreateSale: failed to create sale: %+v, error: %v", sale, err)
 		return errors.Join(errs.ErrInternal, err)
+	}
+
+	//insert sale items
+	for _, saleProduct := range saleRequest.Products {
+		productInfo, err := repository.GetProductByID(saleProduct.Id)
+		if err != nil {
+			logger.Error.Printf("CreateSaleItem: product not found (product_id=%d): %v", productInfo.ID, err)
+			return errors.Join(errs.ErrInvalidValue, err)
+		}
+
+		item := models.SaleItem{
+			SaleID:    saleId,
+			ProductID: productInfo.ID,
+			Quantity:  saleProduct.Count,
+			Price:     productInfo.Price * float64(saleProduct.Count),
+		}
+
+		err = repository.CreateSaleItem(item)
+		if err != nil {
+			logger.Error.Printf("CreateSaleItem: failed to create sale item %+v: %v", item, err)
+			return errors.Join(errs.ErrInternal, err)
+		}
 	}
 
 	logger.Info.Printf("CreateSale: sale created successfully: %+v", sale)

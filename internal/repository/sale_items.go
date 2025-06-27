@@ -42,32 +42,12 @@ func GetSaleItemByID(id int) (models.SaleItem, error) {
 func CreateSaleItem(item models.SaleItem) error {
 	logger.Info.Printf("repository.CreateSaleItem: creating sale item: %+v", item)
 
-	var price float64
-	err := db.GetDBConn().Get(&price,
-		`SELECT price
-               FROM products
-               WHERE id = $1, item.ProductID`)
-	if err != nil {
-		logger.Error.Printf("repository.CreateSaleItem: failed to fetch product price: %v", err)
-		return translateError(err)
-	}
-
-	total := price * float64(item.Quantity)
-
 	query := `
 		INSERT INTO sale_items (sale_id, product_id, quantity, price, created_at, updated_at)
 	    VALUES ($1, $2, $3, $4, NOW(), NOW())`
-	_, err = db.GetDBConn().Exec(query, item.SaleID, item.ProductID, item.Quantity, total)
+	_, err := db.GetDBConn().Exec(query, item.SaleID, item.ProductID, item.Quantity, item.Price)
 	if err != nil {
 		logger.Error.Printf("repository.CreateSaleItem: failed to insert sale item: %v", err)
-		return translateError(err)
-	}
-
-	updateQuery := `UPDATE sales SET total_sum = total_sum + $1 
-                    WHERE id = $2`
-	_, err = db.GetDBConn().Exec(updateQuery, total, item.SaleID)
-	if err != nil {
-		logger.Error.Printf("repository.CreateSaleItem: failed to update sales total_sum: %v", err)
 		return translateError(err)
 	}
 

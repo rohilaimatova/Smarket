@@ -9,3 +9,13 @@ type Sale struct {
 	CreatedAt time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 }
+
+type CreateSaleRequest struct {
+	UserId   int            `json:"user_id"`
+	Products []ProductItems `json:"products"`
+}
+
+type ProductItems struct {
+	Id    int `json:"id"`
+	Count int `json:"count"`
+}

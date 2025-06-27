@@ -547,7 +547,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.CashierSalesReport"
+                            "$ref": "#/definitions/models.Report"
                         }
                     },
                     "400": {
@@ -587,53 +587,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Ошибка сервера при получении позиций продажи",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Создает новую позицию продажи",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "sale-items"
-                ],
-                "summary": "Создать позицию продажи",
-                "parameters": [
-                    {
-                        "description": "Данные позиции продажи",
-                        "name": "saleItem",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.SaleItem"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Позиция продажи успешно создана",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Неверный запрос",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера при создании позиции продажи",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -822,7 +775,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Sale"
+                            "$ref": "#/definitions/models.CreateSaleRequest"
                         }
                     }
                 ],
@@ -1091,29 +1044,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.CashierSalesReport": {
-            "type": "object",
-            "properties": {
-                "cashier": {
-                    "type": "string"
-                },
-                "products": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ProductReport"
-                    }
-                },
-                "sales_count": {
-                    "type": "integer"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "total_items": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.Category": {
             "type": "object",
             "properties": {
@@ -1134,6 +1064,20 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "models.CreateSaleRequest": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProductItems"
+                    }
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1180,13 +1124,24 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProductItems": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ProductReport": {
             "type": "object",
             "properties": {
                 "product_name": {
                     "type": "string"
                 },
-                "total_amount": {
+                "total_price": {
                     "type": "number"
                 },
                 "total_quantity": {
@@ -1230,6 +1185,26 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "unit_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.Report": {
+            "type": "object",
+            "properties": {
+                "sales_count": {
+                    "type": "integer"
+                },
+                "sales_report": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.SalesReport"
+                    }
+                },
+                "total_product_count": {
+                    "type": "integer"
+                },
+                "total_sales_amount": {
                     "type": "number"
                 }
             }
@@ -1280,10 +1255,30 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SalesReport": {
+            "type": "object",
+            "properties": {
+                "cashier": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProductReport"
+                    }
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
         "models.UserSignIn": {
             "type": "object",
             "properties": {
-                "password_hash": {
+                "password": {
                     "type": "string"
                 },
                 "username": {
@@ -1298,7 +1293,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "description": "Пользователь вводит обычный пароль",
                     "type": "string"
                 },
                 "username": {

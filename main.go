@@ -14,13 +14,11 @@ func main() {
 		log.Fatalf("Ошибка чтения настроек: %s", err)
 	}
 
-	// Инициализация логгера
 	if err := logger.Init(); err != nil {
 		log.Fatalf("Ошибка инициализации логгера: %s", err)
 	}
 	logger.Info.Println("Loggers initialized successfully!")
 
-	// Подключение к базе данных
 	if err := db.ConnectDB(); err != nil {
 		logger.Error.Printf("Ошибка подключения к БД: %s", err.Error())
 		return

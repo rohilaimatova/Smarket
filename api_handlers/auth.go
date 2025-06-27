@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// SignUp godoc
+// Auth SignUp godoc
 // @Summary Регистрация нового пользователя
 // @Description Создаёт нового пользователя на основе переданных данных (username, password и т.п.)
 // @Tags auth
@@ -37,7 +37,7 @@ func SignUp(c *gin.Context) {
 	})
 }
 
-// SignIn godoc
+// Auth SignIn godoc
 // @Summary Авторизация пользователя
 // @Description Проверяет имя пользователя и пароль, возвращает JWT токен
 // @Tags auth

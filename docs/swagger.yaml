@@ -1,19 +1,4 @@
 definitions:
-  models.CashierSalesReport:
-    properties:
-      cashier:
-        type: string
-      products:
-        items:
-          $ref: '#/definitions/models.ProductReport'
-        type: array
-      sales_count:
-        type: integer
-      total_amount:
-        type: number
-      total_items:
-        type: integer
-    type: object
   models.Category:
     properties:
       added_by:
@@ -28,6 +13,15 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  models.CreateSaleRequest:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/models.ProductItems'
+        type: array
+      user_id:
+        type: integer
     type: object
   models.ErrorResponse:
     properties:
@@ -57,11 +51,18 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.ProductItems:
+    properties:
+      count:
+        type: integer
+      id:
+        type: integer
+    type: object
   models.ProductReport:
     properties:
       product_name:
         type: string
-      total_amount:
+      total_price:
         type: number
       total_quantity:
         type: integer
@@ -90,6 +91,19 @@ definitions:
       total_price:
         type: number
       unit_price:
+        type: number
+    type: object
+  models.Report:
+    properties:
+      sales_count:
+        type: integer
+      sales_report:
+        items:
+          $ref: '#/definitions/models.SalesReport'
+        type: array
+      total_product_count:
+        type: integer
+      total_sales_amount:
         type: number
     type: object
   models.Sale:
@@ -122,9 +136,22 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.SalesReport:
+    properties:
+      cashier:
+        type: string
+      id:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/models.ProductReport'
+        type: array
+      total_amount:
+        type: number
+    type: object
   models.UserSignIn:
     properties:
-      password_hash:
+      password:
         type: string
       username:
         type: string
@@ -134,7 +161,6 @@ definitions:
       name:
         type: string
       password:
-        description: Пользователь вводит обычный пароль
         type: string
       username:
         type: string
@@ -495,7 +521,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.CashierSalesReport'
+            $ref: '#/definitions/models.Report'
         "400":
           description: Параметры запроса from и to обязательны
           schema:
@@ -524,37 +550,6 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Получить все позиции продажи
-      tags:
-      - sale-items
-    post:
-      consumes:
-      - application/json
-      description: Создает новую позицию продажи
-      parameters:
-      - description: Данные позиции продажи
-        in: body
-        name: saleItem
-        required: true
-        schema:
-          $ref: '#/definitions/models.SaleItem'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Позиция продажи успешно создана
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный запрос
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при создании позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Создать позицию продажи
       tags:
       - sale-items
   /sale-items/{id}:
@@ -675,7 +670,7 @@ paths:
         name: sale
         required: true
         schema:
-          $ref: '#/definitions/models.Sale'
+          $ref: '#/definitions/models.CreateSaleRequest'
       produces:
       - application/json
       responses:
