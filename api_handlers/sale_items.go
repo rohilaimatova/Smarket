@@ -49,33 +49,6 @@ func GetSaleItemByID(c *gin.Context) {
 	c.JSON(http.StatusOK, sale)
 }
 
-// CreateSaleItem godoc
-// @Summary Создать позицию продажи
-// @Description Создает новую позицию продажи
-// @Tags sale-items
-// @Accept json
-// @Produce json
-// @Param saleItem body models.SaleItem true "Данные позиции продажи"
-// @Success 200 {object} map[string]string "Позиция продажи успешно создана"
-// @Failure 400 {object} models.ErrorResponse "Неверный запрос"
-// @Failure 500 {object} models.ErrorResponse "Ошибка сервера при создании позиции продажи"
-// @Router /sale-items [post]
-//func CreateSaleItem(c *gin.Context) {
-//	var newItem models.SaleItem
-//	if err := c.ShouldBindJSON(&newItem); err != nil {
-//		respondWithError(c, http.StatusBadRequest, "Invalid request payload", err)
-//		return
-//	}
-//	err := service.CreateSaleItem(newItem)
-//	if err != nil {
-//		respondWithError(c, http.StatusInternalServerError, "Could not create sale item", err)
-//		return
-//	}
-//	c.JSON(http.StatusOK, gin.H{
-//		"message": "SaleItem created successfully",
-//	})
-//}
-
 // UpdateSaleItem godoc
 // @Summary Обновить позицию продажи
 // @Description Обновляет данные позиции продажи по ID

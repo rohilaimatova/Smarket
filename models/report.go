@@ -2,8 +2,8 @@ package models
 
 type ProductReport struct {
 	ProductName     string  `json:"product_name" db:"product_name"`
-	ProductQuantity int     `json:"total_quantity" db:"quantity"`
-	ProductPrice    float64 `json:"total_price" db:"price"`
+	ProductQuantity int     `json:"quantity" db:"quantity"`
+	ProductPrice    float64 `json:"price" db:"price"`
 }
 
 type SalesReport struct {

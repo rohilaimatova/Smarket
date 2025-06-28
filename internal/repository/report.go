@@ -41,6 +41,7 @@ func GetSalesReport(fromDate, toDate string) (models.Report, error) {
 		}
 
 		sale.Products = productsReport
+		report.Sales = append(report.Sales, sale)
 	}
 
 	summaryQuery := `
@@ -59,7 +60,6 @@ func GetSalesReport(fromDate, toDate string) (models.Report, error) {
 		return report, err
 	}
 
-	report.Sales = salesReport
 	report.TotalSalesAmount = totalAmount
 	report.SalesCount = salesCount
 	report.TotalProductCount = totalItems
