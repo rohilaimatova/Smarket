@@ -19,3 +19,7 @@ type ProductItems struct {
 	Id    int `json:"id"`
 	Count int `json:"count"`
 }
+
+type SaleRequest struct {
+	Products []ProductItems `json:"products"`
+}

@@ -10,12 +10,13 @@ import (
 
 // GetAllProducts godoc
 // @Summary Получить все продукты
+// @Security BearerAuth
 // @Description Возвращает список всех продуктов
 // @Tags products
 // @Produce json
 // @Success 200 {array} models.Product
 // @Failure 500 {object} models.ErrorResponse
-// @Router /products [get]
+// @Router /api/products [get]
 func GetAllProducts(c *gin.Context) {
 	products, err := service.GetAllProducts()
 	if err != nil {
@@ -27,6 +28,7 @@ func GetAllProducts(c *gin.Context) {
 
 // GetProductByID godoc
 // @Summary Получить продукт по ID
+// @Security BearerAuth
 // @Description Возвращает продукт по его идентификатору
 // @Tags products
 // @Produce json
@@ -34,7 +36,7 @@ func GetAllProducts(c *gin.Context) {
 // @Success 200 {object} models.Product
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /products/{id} [get]
+// @Router /api/products/{id} [get]
 func GetProductByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -52,44 +54,69 @@ func GetProductByID(c *gin.Context) {
 
 // CreateProduct godoc
 // @Summary Создать продукт
+// @Security BearerAuth
 // @Description Принимает JSON и создаёт новый продукт
 // @Tags products
 // @Accept json
 // @Produce json
-// @Param product body models.Product true "Новый продукт"
-// @Success 200 {object} map[string]string
+// @Param product body models.CreateProductRequest true "Новый продукт"
+// @Success 201 {object} map[string]string
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /products [post]
+// @Router /api/products [post]
 func CreateProduct(c *gin.Context) {
+	userIDInterface, exists := c.Get("userID")
+	if !exists {
+		respondWithError(c, http.StatusUnauthorized, "User ID not found", nil)
+		return
+	}
+	userID, ok := userIDInterface.(int)
+	if !ok {
+		respondWithError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
+		return
+	}
+
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		respondWithError(c, http.StatusBadRequest, "Invalid JSON payload", err)
 		return
 	}
+	newProduct.AddedBy = userID
 	err := service.CreateProduct(newProduct)
 	if err != nil {
 		respondWithError(c, http.StatusInternalServerError, "Could not create product", err)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Product created successfully",
 	})
 }
 
 // UpdateProduct godoc
 // @Summary Обновить продукт
+// @Security BearerAuth
 // @Description Обновляет данные продукта по ID
 // @Tags products
 // @Accept json
 // @Produce json
 // @Param id path int true "ID продукта"
-// @Param product body models.Product true "Обновлённые данные продукта"
+// @Param product body models.UpdateProductRequest true "Обновлённые данные продукта"
 // @Success 200 {object} models.Product
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /products/{id} [put]
+// @Router /api/products/{id} [put]
 func UpdateProduct(c *gin.Context) {
+	userIDInterface, exists := c.Get("userID")
+	if !exists {
+		respondWithError(c, http.StatusUnauthorized, "User ID not found", nil)
+		return
+	}
+	userID, ok := userIDInterface.(int)
+	if !ok {
+		respondWithError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		respondWithError(c, http.StatusBadRequest, "Invalid product ID", err)
@@ -100,6 +127,7 @@ func UpdateProduct(c *gin.Context) {
 		respondWithError(c, http.StatusBadRequest, "Invalid JSON payload", err)
 		return
 	}
+	updateProduct.AddedBy = userID
 	result, err := service.UpdateProduct(id, updateProduct)
 	if err != nil {
 		respondWithError(c, http.StatusInternalServerError, "Product update faild", err)
@@ -110,6 +138,7 @@ func UpdateProduct(c *gin.Context) {
 
 // DeleteProduct godoc
 // @Summary Удалить продукт
+// @Security BearerAuth
 // @Description Удаляет продукт по ID
 // @Tags products
 // @Produce json
@@ -117,7 +146,7 @@ func UpdateProduct(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /products/{id} [delete]
+// @Router /api/products/{id} [delete]
 func DeleteProduct(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

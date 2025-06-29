@@ -2,12 +2,21 @@ package main
 
 import (
 	"Smarket/api_handlers"
+	_ "Smarket/docs"
 	"Smarket/internal/configs"
 	"Smarket/internal/db"
 	"Smarket/pkg/logger"
 	"log"
 )
 
+// @title Smarket API
+// @version 1.0
+// @description This is the Smarket API for managing sales and inventory
+// @host localhost:8050
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 
 	if err := configs.ReadSettings(); err != nil {

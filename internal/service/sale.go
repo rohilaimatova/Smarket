@@ -41,13 +41,15 @@ func GetSaleByID(id int) (models.Sale, error) {
 }
 
 func CreateSale(saleRequest models.CreateSaleRequest) error {
-	var (
-		totalSum float64
-	)
+	var totalSum float64
 
 	if saleRequest.UserId == 0 || len(saleRequest.Products) == 0 {
 		logger.Warn.Printf("CreateSale: invalid input: %+v", saleRequest)
 		return errs.ErrInvalidValue
+	}
+	if saleRequest.UserId == 0 {
+		logger.Warn.Println("[service] CreateCategory(): user ID is missing")
+		return errs.ErrUnauthorized
 	}
 
 	for _, saleProduct := range saleRequest.Products {

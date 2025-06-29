@@ -10,3 +10,10 @@ type Category struct {
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at" db:"deleted_at"`
 }
+type CreateCategoryRequest struct {
+	Name string `json:"name"`
+}
+
+type UpdateCategoryRequest struct {
+	Name string `json:"name"`
+}

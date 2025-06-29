@@ -18,7 +18,7 @@ import (
 // @Success 200 {object} map[string]string "Успешная регистрация"
 // @Failure 400 {object} models.ErrorResponse "Неверный JSON"
 // @Failure 500 {object} models.ErrorResponse "Ошибка при создании пользователя"
-// @Router /signup [post]
+// @Router /auth/sign-up [post]
 func SignUp(c *gin.Context) {
 	var user models.UserSignUp
 
@@ -48,7 +48,7 @@ func SignUp(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse "Неверный JSON"
 // @Failure 401 {object} models.ErrorResponse "Неверное имя пользователя или пароль"
 // @Failure 500 {object} models.ErrorResponse "Ошибка генерации токена"
-// @Router /signin [post]
+// @Router /auth/sign-in [post]
 func SignIn(c *gin.Context) {
 	var requestUser models.UserSignIn
 

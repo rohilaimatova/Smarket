@@ -45,6 +45,10 @@ func CreateCategory(category models.Category) error {
 		logger.Warn.Println("[service] CreateCategory(): empty category name provided")
 		return errs.ErrInvalidValue
 	}
+	if category.AddedBy == 0 {
+		logger.Warn.Println("[service] CreateCategory(): user ID is missing")
+		return errs.ErrUnauthorized
+	}
 
 	if err := repository.Create(category); err != nil {
 		logger.Error.Printf("[service] CreateCategory(): failed to create category %+v: %v\n", category, err)

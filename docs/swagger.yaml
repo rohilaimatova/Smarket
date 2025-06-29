@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.Category:
     properties:
@@ -14,13 +15,20 @@ definitions:
       updated_at:
         type: string
     type: object
-  models.CreateSaleRequest:
+  models.CreateCategoryRequest:
     properties:
-      products:
-        items:
-          $ref: '#/definitions/models.ProductItems'
-        type: array
-      user_id:
+      name:
+        type: string
+    type: object
+  models.CreateProductRequest:
+    properties:
+      category_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
         type: integer
     type: object
   models.ErrorResponse:
@@ -60,11 +68,11 @@ definitions:
     type: object
   models.ProductReport:
     properties:
+      price:
+        type: number
       product_name:
         type: string
-      total_price:
-        type: number
-      total_quantity:
+      quantity:
         type: integer
     type: object
   models.Receipt:
@@ -136,6 +144,13 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.SaleRequest:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/models.ProductItems'
+        type: array
+    type: object
   models.SalesReport:
     properties:
       cashier:
@@ -148,6 +163,33 @@ definitions:
         type: array
       total_amount:
         type: number
+    type: object
+  models.UpdateCategoryRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  models.UpdateProductRequest:
+    properties:
+      category_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  models.UpdateSaleItemRequest:
+    properties:
+      price:
+        type: number
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      sale_id:
+        type: integer
     type: object
   models.UserSignIn:
     properties:
@@ -165,10 +207,14 @@ definitions:
       username:
         type: string
     type: object
+host: localhost:8050
 info:
   contact: {}
+  description: This is the Smarket API for managing sales and inventory
+  title: Smarket API
+  version: "1.0"
 paths:
-  /categories:
+  /api/categories:
     get:
       description: Возвращает список всех категорий
       produces:
@@ -184,6 +230,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Получить все категории
       tags:
       - categories
@@ -197,12 +245,12 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/models.Category'
+          $ref: '#/definitions/models.CreateCategoryRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             additionalProperties:
               type: string
@@ -215,10 +263,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Создать новую категорию
       tags:
       - categories
-  /categories/{id}:
+  /api/categories/{id}:
     delete:
       description: Удаляет категорию по ID. Если используется — выдаёт ошибку.
       parameters:
@@ -252,6 +302,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Удалить категорию
       tags:
       - categories
@@ -278,6 +330,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Получить категорию по ID
       tags:
       - categories
@@ -296,7 +350,7 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/models.Category'
+          $ref: '#/definitions/models.UpdateCategoryRequest'
       produces:
       - application/json
       responses:
@@ -312,25 +366,12 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Обновить категорию
       tags:
       - categories
-  /ping:
-    get:
-      description: Проверяет, работает ли сервер, и возвращает сообщение
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Сервер работает
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Проверка доступности сервера
-      tags:
-      - system
-  /products:
+  /api/products:
     get:
       description: Возвращает список всех продуктов
       produces:
@@ -346,6 +387,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Получить все продукты
       tags:
       - products
@@ -359,12 +402,12 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/models.Product'
+          $ref: '#/definitions/models.CreateProductRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             additionalProperties:
               type: string
@@ -377,10 +420,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Создать продукт
       tags:
       - products
-  /products/{id}:
+  /api/products/{id}:
     delete:
       description: Удаляет продукт по ID
       parameters:
@@ -406,6 +451,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Удалить продукт
       tags:
       - products
@@ -432,6 +479,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Получить продукт по ID
       tags:
       - products
@@ -450,7 +499,7 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/models.Product'
+          $ref: '#/definitions/models.UpdateProductRequest'
       produces:
       - application/json
       responses:
@@ -466,9 +515,361 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Обновить продукт
       tags:
       - products
+  /api/sale-items:
+    get:
+      description: Возвращает список всех позиций продажи (SaleItems)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SaleItem'
+            type: array
+        "500":
+          description: Ошибка сервера при получении позиций продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить все позиции продажи
+      tags:
+      - sale-items
+  /api/sale-items/{id}:
+    delete:
+      description: Удаляет позицию продажи по ID
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Позиция продажи успешно удалена
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при удалении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить позицию продажи
+      tags:
+      - sale-items
+    get:
+      description: Возвращает позицию продажи по идентификатору
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SaleItem'
+        "400":
+          description: Неверный ID позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при получении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить позицию продажи по ID
+      tags:
+      - sale-items
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные позиции продажи по ID
+      parameters:
+      - description: ID позиции продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные позиции продажи
+        in: body
+        name: saleItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSaleItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SaleItem'
+        "400":
+          description: Неверный запрос или ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при обновлении позиции продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Обновить позицию продажи
+      tags:
+      - sale-items
+  /api/sales:
+    get:
+      description: Возвращает список всех продаж
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Sale'
+            type: array
+        "500":
+          description: Ошибка сервера при получении продаж
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить все продажи
+      tags:
+      - sales
+    post:
+      consumes:
+      - application/json
+      description: Создает новую продажу
+      parameters:
+      - description: Данные продажи
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешное создание
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при создании продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать продажу
+      tags:
+      - sales
+  /api/sales/{id}:
+    get:
+      description: Возвращает продажу по идентификатору
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sale'
+        "400":
+          description: Неверный ID продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при получении продажи
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить продажу по ID
+      tags:
+      - sales
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные продажи по ID
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные продажи
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sale'
+        "400":
+          description: Неверный запрос или ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при обновлении
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Обновить продажу
+      tags:
+      - sales
+  /auth/sales/{id}:
+    delete:
+      description: Удаляет продажу по ID
+      parameters:
+      - description: ID продажи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Удаление успешно
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка сервера при удалении
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить продажу
+      tags:
+      - sales
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет имя пользователя и пароль, возвращает JWT токен
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT access token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный JSON
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Неверное имя пользователя или пароль
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка генерации токена
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Авторизация пользователя
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя на основе переданных данных (username,
+        password и т.п.)
+      parameters:
+      - description: Данные нового пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная регистрация
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный JSON
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Ошибка при создании пользователя
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - auth
+  /ping:
+    get:
+      description: Проверяет, работает ли сервер, и возвращает сообщение
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Сервер работает
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Проверка доступности сервера
+      tags:
+      - system
   /receipts/{id}:
     get:
       description: Возвращает информацию о чеке продажи по идентификатору
@@ -533,320 +934,9 @@ paths:
       summary: Получить отчёт по продажам за период
       tags:
       - reports
-  /sale-items:
-    get:
-      description: Возвращает список всех позиций продажи (SaleItems)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.SaleItem'
-            type: array
-        "500":
-          description: Ошибка сервера при получении позиций продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Получить все позиции продажи
-      tags:
-      - sale-items
-  /sale-items/{id}:
-    delete:
-      description: Удаляет позицию продажи по ID
-      parameters:
-      - description: ID позиции продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Позиция продажи успешно удалена
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный ID позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при удалении позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Удалить позицию продажи
-      tags:
-      - sale-items
-    get:
-      description: Возвращает позицию продажи по идентификатору
-      parameters:
-      - description: ID позиции продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SaleItem'
-        "400":
-          description: Неверный ID позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при получении позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Получить позицию продажи по ID
-      tags:
-      - sale-items
-    put:
-      consumes:
-      - application/json
-      description: Обновляет данные позиции продажи по ID
-      parameters:
-      - description: ID позиции продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Обновленные данные позиции продажи
-        in: body
-        name: saleItem
-        required: true
-        schema:
-          $ref: '#/definitions/models.SaleItem'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SaleItem'
-        "400":
-          description: Неверный запрос или ID
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при обновлении позиции продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Обновить позицию продажи
-      tags:
-      - sale-items
-  /sales:
-    get:
-      description: Возвращает список всех продаж
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Sale'
-            type: array
-        "500":
-          description: Ошибка сервера при получении продаж
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Получить все продажи
-      tags:
-      - sales
-    post:
-      consumes:
-      - application/json
-      description: Создает новую продажу
-      parameters:
-      - description: Данные продажи
-        in: body
-        name: sale
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateSaleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешное создание
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный запрос
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при создании продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Создать продажу
-      tags:
-      - sales
-  /sales/{id}:
-    delete:
-      description: Удаляет продажу по ID
-      parameters:
-      - description: ID продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Удаление успешно
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный ID
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при удалении
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Удалить продажу
-      tags:
-      - sales
-    get:
-      description: Возвращает продажу по идентификатору
-      parameters:
-      - description: ID продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Sale'
-        "400":
-          description: Неверный ID продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при получении продажи
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Получить продажу по ID
-      tags:
-      - sales
-    put:
-      consumes:
-      - application/json
-      description: Обновляет данные продажи по ID
-      parameters:
-      - description: ID продажи
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Обновленные данные продажи
-        in: body
-        name: sale
-        required: true
-        schema:
-          $ref: '#/definitions/models.Sale'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Sale'
-        "400":
-          description: Неверный запрос или ID
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка сервера при обновлении
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Обновить продажу
-      tags:
-      - sales
-  /signin:
-    post:
-      consumes:
-      - application/json
-      description: Проверяет имя пользователя и пароль, возвращает JWT токен
-      parameters:
-      - description: Данные для входа
-        in: body
-        name: credentials
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserSignIn'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: JWT access token
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный JSON
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "401":
-          description: Неверное имя пользователя или пароль
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка генерации токена
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Авторизация пользователя
-      tags:
-      - auth
-  /signup:
-    post:
-      consumes:
-      - application/json
-      description: Создаёт нового пользователя на основе переданных данных (username,
-        password и т.п.)
-      parameters:
-      - description: Данные нового пользователя
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserSignUp'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешная регистрация
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Неверный JSON
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Ошибка при создании пользователя
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Регистрация нового пользователя
-      tags:
-      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

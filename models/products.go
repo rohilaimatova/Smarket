@@ -13,3 +13,17 @@ type Product struct {
 	UpdateAt   *time.Time `json:"updated_at" db:"updated_at"`
 	DeletedAt  *time.Time `json:"deleted_at" db:"deleted_at"`
 }
+
+type CreateProductRequest struct {
+	Name       string  `json:"name	"`
+	Price      float64 `json:"price"`
+	Quantity   int     `json:"quantity"`
+	CategoryID int     `json:"category_id" db:"category_id"`
+}
+
+type UpdateProductRequest struct {
+	Name       string  `json:"name	"`
+	Price      float64 `json:"price"`
+	Quantity   int     `json:"quantity"`
+	CategoryID int     `json:"category_id" db:"category_id"`
+}

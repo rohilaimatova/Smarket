@@ -39,6 +39,10 @@ func CreateProduct(product models.Product) error {
 		logger.Warn.Println("[service] CreateProduct(): empty product name")
 		return errs.ErrInvalidValue
 	}
+	if product.AddedBy == 0 {
+		logger.Warn.Println("[service] CreateCategory(): user ID is missing")
+		return errs.ErrUnauthorized
+	}
 
 	if err := repository.CreateProduct(product); err != nil {
 		logger.Error.Printf("[service] CreateProduct(): failed to create product %+v: %v\n", product, err)

@@ -1,14 +1,14 @@
-package api_handlers
-
 // @title Smarket API
 // @version 1.0
 // @description This is the Smarket API for managing sales and inventory
 // @host localhost:8050
 // @BasePath /
-
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+
+package api_handlers
+
 import (
 	"Smarket/api_handlers/middleware"
 	"Smarket/docs"

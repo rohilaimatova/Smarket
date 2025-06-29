@@ -5,6 +5,7 @@ import (
 )
 
 var (
+	ErrUnauthorized                = errors.New("unauthorized")
 	ErrProductNotFound             = errors.New("no product found")
 	ErrInternal                    = errors.New("internal error")
 	ErrNoCategoriesFound           = errors.New("no categories found")

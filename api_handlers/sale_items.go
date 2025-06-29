@@ -10,12 +10,13 @@ import (
 
 // GetAllSaleItems godoc
 // @Summary Получить все позиции продажи
+// @Security BearerAuth
 // @Description Возвращает список всех позиций продажи (SaleItems)
 // @Tags sale-items
 // @Produce json
 // @Success 200 {array} models.SaleItem
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при получении позиций продажи"
-// @Router /sale-items [get]
+// @Router /api/sale-items [get]
 func GetAllSaleItems(c *gin.Context) {
 	sale, err := service.GetAllSaleItems()
 	if err != nil {
@@ -26,6 +27,7 @@ func GetAllSaleItems(c *gin.Context) {
 
 // GetSaleItemByID godoc
 // @Summary Получить позицию продажи по ID
+// @Security BearerAuth
 // @Description Возвращает позицию продажи по идентификатору
 // @Tags sale-items
 // @Produce json
@@ -33,7 +35,7 @@ func GetAllSaleItems(c *gin.Context) {
 // @Success 200 {object} models.SaleItem
 // @Failure 400 {object} models.ErrorResponse "Неверный ID позиции продажи"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при получении позиции продажи"
-// @Router /sale-items/{id} [get]
+// @Router /api/sale-items/{id} [get]
 func GetSaleItemByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -51,16 +53,17 @@ func GetSaleItemByID(c *gin.Context) {
 
 // UpdateSaleItem godoc
 // @Summary Обновить позицию продажи
+// @Security BearerAuth
 // @Description Обновляет данные позиции продажи по ID
 // @Tags sale-items
 // @Accept json
 // @Produce json
 // @Param id path int true "ID позиции продажи"
-// @Param saleItem body models.SaleItem true "Обновленные данные позиции продажи"
-// @Success 200 {object} models.SaleItem
+// @Param saleItem body models.UpdateSaleItemRequest true "Обновленные данные позиции продажи"
+// @Success 201 {object} models.SaleItem
 // @Failure 400 {object} models.ErrorResponse "Неверный запрос или ID"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при обновлении позиции продажи"
-// @Router /sale-items/{id} [put]
+// @Router /api/sale-items/{id} [put]
 func UpdateSaleItem(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -77,11 +80,12 @@ func UpdateSaleItem(c *gin.Context) {
 		respondWithError(c, http.StatusInternalServerError, "Could not update sale item", err)
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusCreated, result)
 }
 
 // DeleteSaleItem godoc
 // @Summary Удалить позицию продажи
+// @Security BearerAuth
 // @Description Удаляет позицию продажи по ID
 // @Tags sale-items
 // @Produce json
@@ -89,7 +93,7 @@ func UpdateSaleItem(c *gin.Context) {
 // @Success 200 {object} map[string]string "Позиция продажи успешно удалена"
 // @Failure 400 {object} models.ErrorResponse "Неверный ID позиции продажи"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при удалении позиции продажи"
-// @Router /sale-items/{id} [delete]
+// @Router /api/sale-items/{id} [delete]
 func DeleteSaleItem(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

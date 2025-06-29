@@ -11,12 +11,13 @@ import (
 
 // GetAllCategories godoc
 // @Summary Получить все категории
+// @Security BearerAuth
 // @Description Возвращает список всех категорий
 // @Tags categories
 // @Produce json
 // @Success 200 {array} models.Category
 // @Failure 500 {object} models.ErrorResponse
-// @Router /categories [get]
+// @Router /api/categories [get]
 func GetAllCategories(c *gin.Context) {
 	categories, err := service.GetAllCategories()
 	if err != nil {
@@ -28,6 +29,7 @@ func GetAllCategories(c *gin.Context) {
 
 // GetCategoryByID godoc
 // @Summary Получить категорию по ID
+// @Security BearerAuth
 // @Description Возвращает категорию по ID
 // @Tags categories
 // @Produce json
@@ -35,7 +37,7 @@ func GetAllCategories(c *gin.Context) {
 // @Success 200 {object} models.Category
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
-// @Router /categories/{id} [get]
+// @Router /api/categories/{id} [get]
 func GetCategoryByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,43 +57,67 @@ func GetCategoryByID(c *gin.Context) {
 
 // CreateCategory godoc
 // @Summary Создать новую категорию
+// @Security BearerAuth
 // @Description Принимает JSON и создаёт категорию
 // @Tags categories
 // @Accept json
 // @Produce json
-// @Param category body models.Category true "Категория"
-// @Success 200 {object} map[string]string
+// @Param category body models.CreateCategoryRequest true "Категория"
+// @Success 201 {object} map[string]string
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /categories [post]
+// @Router /api/categories [post]
 func CreateCategory(c *gin.Context) {
+	userIDInterface, exists := c.Get("userID")
+	if !exists {
+		respondWithError(c, http.StatusBadRequest, "User ID not found in context", nil)
+		return
+	}
+	userID, ok := userIDInterface.(int)
+	if !ok {
+		respondWithError(c, http.StatusBadRequest, "invalid user ID type", nil)
+		return
+	}
 	var input models.Category
 	if err := c.ShouldBindJSON(&input); err != nil {
 		respondWithError(c, http.StatusBadRequest, "Invalid JSON body", err)
 		return
 	}
+	input.AddedBy = userID
 
 	if err := service.CreateCategory(input); err != nil {
 		respondWithError(c, http.StatusInternalServerError, "Failed to create category", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Category created successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Category created successfully"})
 }
 
 // UpdateCategory godoc
 // @Summary Обновить категорию
+// @Security BearerAuth
 // @Description Обновляет категорию по ID
 // @Tags categories
 // @Accept json
 // @Produce json
 // @Param id path int true "ID категории"
-// @Param category body models.Category true "Обновлённая категория"
+// @Param category body models.UpdateCategoryRequest true "Обновлённая категория"
 // @Success 200 {object} models.Category
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
-// @Router /categories/{id} [put]
+// @Router /api/categories/{id} [put]
 func UpdateCategory(c *gin.Context) {
+	userIDInterface, exists := c.Get("userID")
+	if !exists {
+		respondWithError(c, http.StatusUnauthorized, "User ID not found", nil)
+		return
+	}
+	userID, ok := userIDInterface.(int)
+	if !ok {
+		respondWithError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		respondWithError(c, http.StatusBadRequest, "Invalid category ID", err)
@@ -103,6 +129,7 @@ func UpdateCategory(c *gin.Context) {
 		respondWithError(c, http.StatusBadRequest, "Invalid JSON body", err)
 		return
 	}
+	updateCategory.AddedBy = userID
 
 	result, err := service.UpdateCategory(id, updateCategory)
 	if err != nil {
@@ -115,6 +142,7 @@ func UpdateCategory(c *gin.Context) {
 
 // DeleteCategory godoc
 // @Summary Удалить категорию
+// @Security BearerAuth
 // @Description Удаляет категорию по ID. Если используется — выдаёт ошибку.
 // @Tags categories
 // @Produce json
@@ -124,7 +152,7 @@ func UpdateCategory(c *gin.Context) {
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 409 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /categories/{id} [delete]
+// @Router /api/categories/{id} [delete]
 func DeleteCategory(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
