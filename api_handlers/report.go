@@ -8,6 +8,7 @@ import (
 
 // GetSalesReport godoc
 // @Summary Получить отчёт по продажам за период
+// @Security BearerAuth
 // @Description Возвращает отчёт по продажам между датами from и to (в формате YYYY-MM-DD)
 // @Tags reports
 // @Produce json
@@ -16,7 +17,7 @@ import (
 // @Success 200 {object} models.Report
 // @Failure 400 {object} models.ErrorResponse "Параметры запроса from и to обязательны"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при формировании отчёта"
-// @Router /reports/sales [get]
+// @Router /api/report [get]
 func GetSalesReport(c *gin.Context) {
 	from := c.Query("from")
 	to := c.Query("to")

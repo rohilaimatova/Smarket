@@ -11,6 +11,7 @@ import (
 
 // GetReceipt godoc
 // @Summary Получить чек по ID продажи
+// @Security BearerAuth
 // @Description Возвращает информацию о чеке продажи по идентификатору
 // @Tags receipts
 // @Produce json
@@ -19,7 +20,7 @@ import (
 // @Failure 400 {object} models.ErrorResponse "Неверный ID продажи"
 // @Failure 404 {object} models.ErrorResponse "Чек не найден"
 // @Failure 500 {object} models.ErrorResponse "Ошибка сервера при получении чека"
-// @Router /receipts/{id} [get]
+// @Router /api/sales/{id}/receipt [get]
 func GetReceipt(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

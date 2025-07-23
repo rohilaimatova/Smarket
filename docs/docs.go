@@ -497,6 +497,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/report": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Возвращает отчёт по продажам между датами from и to (в формате YYYY-MM-DD)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Получить отчёт по продажам за период",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Дата начала периода (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата конца периода (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Report"
+                        }
+                    },
+                    "400": {
+                        "description": "Параметры запроса from и to обязательны",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера при формировании отчёта",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/sale-items": {
             "get": {
                 "security": [
@@ -868,6 +921,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/sales/{id}/receipt": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Возвращает информацию о чеке продажи по идентификатору",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipts"
+                ],
+                "summary": "Получить чек по ID продажи",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID продажи",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Receipt"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный ID продажи",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Чек не найден",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера при получении чека",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/sales/{id}": {
             "delete": {
                 "security": [
@@ -1039,101 +1144,6 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/receipts/{id}": {
-            "get": {
-                "description": "Возвращает информацию о чеке продажи по идентификатору",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "receipts"
-                ],
-                "summary": "Получить чек по ID продажи",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID продажи",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Receipt"
-                        }
-                    },
-                    "400": {
-                        "description": "Неверный ID продажи",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Чек не найден",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера при получении чека",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/reports/sales": {
-            "get": {
-                "description": "Возвращает отчёт по продажам между датами from и to (в формате YYYY-MM-DD)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reports"
-                ],
-                "summary": "Получить отчёт по продажам за период",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Дата начала периода (YYYY-MM-DD)",
-                        "name": "from",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Дата конца периода (YYYY-MM-DD)",
-                        "name": "to",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Report"
-                        }
-                    },
-                    "400": {
-                        "description": "Параметры запроса from и to обязательны",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера при формировании отчёта",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
