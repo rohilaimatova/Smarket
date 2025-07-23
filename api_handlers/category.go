@@ -3,10 +3,13 @@ package api_handlers
 import (
 	"Smarket/internal/service"
 	"Smarket/models"
+	"Smarket/pkg/smRedis"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // GetAllCategories godoc
@@ -19,11 +22,31 @@ import (
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/categories [get]
 func GetAllCategories(c *gin.Context) {
+	cacheKey := "categories:all"
+
+	// Пробуем взять из Redis
+	cached, err := smRedis.Rdb.Get(smRedis.Ctx, cacheKey).Result()
+	if err == nil {
+		var categories []models.Category
+		if err := json.Unmarshal([]byte(cached), &categories); err == nil {
+			c.JSON(http.StatusOK, categories)
+			return
+		}
+	}
+
+	// Если в Redis нет — берём из базы
 	categories, err := service.GetAllCategories()
 	if err != nil {
-		respondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch categories",
+		})
 		return
 	}
+
+	// Кладём результат в Redis
+	data, _ := json.Marshal(categories)
+	smRedis.Rdb.Set(smRedis.Ctx, cacheKey, data, 5*time.Minute)
+
 	c.JSON(http.StatusOK, categories)
 }
 

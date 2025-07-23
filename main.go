@@ -6,6 +6,7 @@ import (
 	"Smarket/internal/configs"
 	"Smarket/internal/db"
 	"Smarket/pkg/logger"
+	"Smarket/pkg/smRedis"
 	"log"
 )
 
@@ -18,6 +19,7 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	smRedis.InitRedis()
 
 	if err := configs.ReadSettings(); err != nil {
 		log.Fatalf("Ошибка чтения настроек: %s", err)
